@@ -3,6 +3,7 @@ public class Cell {
     private boolean isFlagged;
 
     private boolean isChecked;
+    private int numOfAdjacentMines;
 
     public Cell() {
         this.isMine = false;
@@ -33,5 +34,16 @@ public class Cell {
     public void setChecked(boolean checked) {
         isChecked = checked;
     }
+    public int getNumOfAdjacentMines() {
+        return numOfAdjacentMines;
+    }
 
+    public void setNumOfAdjacentMines(int numOfAdjacentMines) {
+        this.numOfAdjacentMines = numOfAdjacentMines;
+    }
+
+    @Override
+    public String toString() {
+        return (!isMine) ? Integer.toString(numOfAdjacentMines) : "*" ;
+    }
 }
