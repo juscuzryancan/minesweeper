@@ -6,78 +6,102 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         boolean isPlaying = true;
         Grid grid;
-
         System.out.println("Welcome to Minesweeper!");
-
         while (isPlaying) {
             System.out.println("Let's initialize the board");
-            System.out.println("Please enter how many rows you would like");
-            System.out.print("Rows: ");
+            int rows = getRows(scanner);
+            int cols = getCols(scanner);
+            int numOfMines = getNumOfMines(scanner, rows, cols);
+            grid = new Grid(rows, cols, numOfMines);
+            grid.printBoard();
+            while(!grid.isGameOver()) {
+                playerTurn(rows, scanner, cols, grid);
+            }
+            isPlaying = confirmPlayAgain(scanner);
+        }
+        System.out.println("Thanks for playing :)");
+        scanner.close();
+    }
+
+    private static boolean confirmPlayAgain(Scanner scanner) {
+        boolean isPlaying;
+        System.out.println("Would you like to play again?");
+        System.out.println("(Y/N): ");
+        while (!scanner.hasNext(Pattern.compile("Y|N"))) {
+            System.out.print("Please input a Y/N: ");
+            scanner.next();
+        }
+        String playAgainInput = scanner.next();
+        isPlaying = playAgainInput.equals("Y");
+        return isPlaying;
+    }
+
+    private static void playerTurn(int rows, Scanner scanner, int cols, Grid grid) {
+        int row;
+        do {
+            System.out.printf("Please enter a row from 0 to %d\n", rows - 1);
+            System.out.print("Row: ");
             while (!scanner.hasNextInt()) {
                 System.out.print("Please input a number: ");
                 scanner.next();
             }
-            int rows = scanner.nextInt();
+            row = scanner.nextInt();
+        } while (row < 0 || row >= rows);
 
-            System.out.println("Please enter how many columns you would like");
+        int col;
+        do {
+            System.out.printf("Please enter a Column from 0 to %d\n", cols - 1);
+            System.out.print("Column: ");
+            while (!scanner.hasNextInt()) {
+                System.out.print("Please input a number: ");
+                scanner.next();
+            }
+            col = scanner.nextInt();
+        } while (col < 0 || col >= cols);
+
+        grid.playerMove(row, col);
+        grid.printBoard();
+    }
+
+    private static int getNumOfMines(Scanner scanner, int rows, int cols) {
+        int numOfMines;
+        do {
+            System.out.println("Please enter how many mines you would like (Greater than 0 and Less than the number of cells on the board)");
+            System.out.print("Mines: ");
+            while (!scanner.hasNextInt()) {
+                System.out.print("Please input a number that is less than the number of cells within the Board: ");
+                scanner.next();
+            }
+            numOfMines = scanner.nextInt();
+        } while (numOfMines <= 0 || numOfMines >= (rows * cols));
+        return numOfMines;
+    }
+
+    private static int getCols(Scanner scanner) {
+        int cols;
+        do {
+            System.out.println("Please enter how many columns you would like (Greater than 0)");
             System.out.print("Columns: ");
             while (!scanner.hasNextInt()) {
                 System.out.print("Please input a number: ");
                 scanner.next();
             }
-            int cols = scanner.nextInt();
+            cols = scanner.nextInt();
+        } while (cols <= 0);
+        return cols;
+    }
 
-            System.out.println("Please enter how many mines you would like");
-            System.out.print("Mines: ");
-            // not working
+    private static int getRows(Scanner scanner) {
+        int rows;
+        do {
+            System.out.println("Please enter how many rows you would like (Greater than 0)");
+            System.out.print("Rows: ");
             while (!scanner.hasNextInt()) {
-                System.out.print("Please input a number that is less than the number of cells within the Board: ");
+                System.out.print("Please input a number: ");
                 scanner.next();
             }
-
-            int numOfMines = scanner.nextInt();
-            System.out.println();
-            if (numOfMines >= (rows * cols)) {
-                System.out.println("You've entered a number greater than the max allowed"); // change this print to something more accurate
-                System.out.println("Setting the number of mines to 1 less than the max");
-                System.out.println("Good Luck on trying to win :)");
-            }
-
-            grid = new Grid(rows, cols, numOfMines);
-            grid.printBoard();
-
-            while(!grid.isGameOver()) {
-                System.out.printf("Please enter a row from 0 to %d\n", rows - 1);
-                System.out.print("Row: ");
-                while (!scanner.hasNextInt()) {
-                    System.out.print("Please input a number: ");
-                    scanner.next();
-                }
-                int row = scanner.nextInt();
-
-                System.out.printf("Please enter a Column from 0 to %d\n", cols - 1);
-                System.out.print("Column: ");
-                while (!scanner.hasNextInt()) {
-                    System.out.print("Please input a number: ");
-                    scanner.next();
-                }
-                int col = scanner.nextInt();
-
-                grid.playerMove(row, col);
-                grid.printBoard();
-
-            }
-
-            System.out.println("Would you like to play again?");
-            System.out.println("(Y/N): ");
-            while (!scanner.hasNext(Pattern.compile("Y|N"))) {
-                System.out.print("Please input a Y/N: ");
-                scanner.next();
-            }
-            String playAgainInput = scanner.next();
-            isPlaying = playAgainInput.equals("Y");
-        }
-        System.out.println("Thanks for playing :)");
-        scanner.close();
+            rows = scanner.nextInt();
+        } while (rows <= 0);
+        return rows;
     }
 }

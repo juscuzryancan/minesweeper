@@ -2,6 +2,7 @@ public class Grid {
     private int rows;
     private int columns;
     private int numOfMines;
+    private int numOfCheckedCells;
     private Cell[][] board;
 
 
@@ -11,6 +12,7 @@ public class Grid {
         this.rows = rows;
         this.columns = cols;
         this.numOfMines = numOfMines;
+        this.numOfCheckedCells = 0;
         initializeBoard(rows, cols);
         generateMines();
         calculateAdjacentNumberOfMines();
@@ -84,7 +86,13 @@ public class Grid {
         }
 
         board[row][col].setChecked(true);
+        numOfCheckedCells++;
         playerMoveHelper(row, col);
+        if(numOfCheckedCells == (rows * columns) - numOfMines){
+            System.out.println("CONGRATULATIONS!!! You revealed all the cells");
+            this.revealAll();
+            this.setGameOver(true);
+        }
     }
 
     private void playerMoveHelper(int row, int col) {
@@ -93,6 +101,7 @@ public class Grid {
             return;
         }
         board[row][col].setChecked(true);
+        numOfCheckedCells++;
         if(board[row][col].getNumOfAdjacentMines() > 0) return;
         for(int xOff = -1; xOff <= 1; xOff++) {
             for(int yOff = -1; yOff <= 1; yOff++) {
