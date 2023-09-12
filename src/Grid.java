@@ -43,7 +43,7 @@ public class Grid {
                 for(int xOff = -1; xOff <= 1; xOff++) {
                     for(int yOff = -1; yOff <= 1; yOff++) {
                         if(xOff == 0 && yOff == 0) continue;
-                        sumOfMines += checkForMine(i + xOff, j + yOff);
+                        sumOfMines += checkCellForMine(i + xOff, j + yOff);
                     }
                 }
                 board[i][j].setNumOfAdjacentMines(sumOfMines);
@@ -51,7 +51,7 @@ public class Grid {
         }
     }
 
-    private int checkForMine(int row, int col) {
+    private int checkCellForMine(int row, int col) {
         if (row < 0 || row >= rows || col < 0 || col >= columns || !board[row][col].isMine()) return 0;
         return 1;
     }
@@ -65,17 +65,38 @@ public class Grid {
         }
     }
 
+    public void playerMove(int row, int col) {
+        //messing up due to the player move returning early with a mine
+        if (row < 0 || row >= rows || col < 0 || col >= columns) {
+            System.out.println("The coordinates entered are out of bounds. Please Try Again");
+            return;
+        }
+        if (board[row][col].isChecked()) {
+            System.out.println("This cell has already been checked");
+            return;
+        }
 
-    //the dfsing happens
-    public void check(int x, int y) {
-        if (x < 0 || x >= rows || y < 0 || y >= columns || board[x][y].isMine()) return;
-        board[x][y].setChecked(true);
-        if(board[x][y].getNumOfAdjacentMines() > 0) return;
+        if (board[row][col].isMine()) {
+            System.out.println("KABOOM!!! Oh no you stepped on a mine");
+            this.revealAll();
+            this.setGameOver(true);
+            return;
+        }
 
+        board[row][col].setChecked(true);
+        playerMoveHelper(row, col);
+    }
+
+    private void playerMoveHelper(int row, int col) {
+        if (row < 0 || row >= rows || col < 0 || col >= columns || board[row][col].isMine() || board[row][col].isChecked()) {
+            System.out.println("The coordinates entered are out of bounds. Please Try Again");
+            return;
+        }
+        board[row][col].setChecked(true);
+        if(board[row][col].getNumOfAdjacentMines() > 0) return;
         for(int xOff = -1; xOff <= 1; xOff++) {
             for(int yOff = -1; yOff <= 1; yOff++) {
-                if(xOff == 0 && yOff == 0) continue;
-                check(x + xOff, y + yOff);
+                playerMoveHelper(row + xOff, col + yOff);
             }
         }
     }
@@ -93,6 +114,15 @@ public class Grid {
             System.out.println();
         }
     }
+
+    public void revealAll() {
+        for (int i = 0; i < this.board.length; i++) {
+            for (int j = 0; j < this.board[i].length; j++) {
+                board[i][j].setChecked(true);
+            }
+        }
+    }
+
     public boolean isGameOver() {
         return isGameOver;
     }
